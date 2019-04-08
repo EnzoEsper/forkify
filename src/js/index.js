@@ -35,3 +35,13 @@ elements.searchForm.addEventListener('submit', e => {
   e.preventDefault();
   controlSearch();
 });
+
+elements.searchResPages.addEventListener('click', e => {
+  const btn = e.target.closest('.btn-inline');
+  console.log(btn);
+  if (btn) {
+    const goToPage = btn.dataset.goto;
+    console.log(goToPage);
+  }
+
+});
