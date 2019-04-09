@@ -24,12 +24,17 @@ const controlSearch = async () => {
     searchView.clearResults();
     renderLoader(elements.searchRes)
 
-    // 4. Search for recipies
-    await state.search.getResults();
-
-    // 5. Render results on the UI
-    clearLoader();
-    searchView.renderResults(state.search.result);
+    try {
+      // 4. Search for recipies
+      await state.search.getResults();
+  
+      // 5. Render results on the UI
+      clearLoader();
+      searchView.renderResults(state.search.result);
+    } catch (error) {
+      alert('Something wrong in the search...');
+      clearLoader();
+    }
   }
 };
 
@@ -49,7 +54,37 @@ elements.searchResPages.addEventListener('click', e => {
 });
 
 //CONTROLADOR RECIPE
+const controlRecipe = async () => {
+  // Se obtiene el ID de la URL
+  const id = window.location.hash.replace('#', '');
+  console.log(id);
 
-const r = new Recipe(46956);
-r.getRecipe();
-console.log(r);
+  if (id) {
+    // Preparar la UI para los cambios
+
+    // Crear un nuevo objeto recipe
+    state.recipe = new Recipe(id);
+
+    
+    try {
+      // Obtener los datos del recipe
+      await state.recipe.getRecipe();
+  
+      // Calcular porciones(serving) y tiempo(time)
+      state.recipe.calcTime();
+      state.recipe.calcServings();
+      
+      // Render the recipe
+      console.log(state.recipe);
+      
+    } catch (error) {
+      alert('Error processing recipe!');
+    }
+  }
+}
+
+/* 
+window.addEventListener('hashchange', controlRecipe);
+window.addEventListener('load', controlRecipe); 
+ESTO SE PUEDE HACER EN UNA SOLA LINEA DE CODIGO*/
+['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe));
