@@ -38,10 +38,10 @@ elements.searchForm.addEventListener('submit', e => {
 
 elements.searchResPages.addEventListener('click', e => {
   const btn = e.target.closest('.btn-inline');
-  console.log(btn);
   if (btn) {
-    const goToPage = btn.dataset.goto;
-    console.log(goToPage);
+    const goToPage = parseInt(btn.dataset.goto);
+    searchView.clearResults();
+    searchView.renderResults(state.search.result, goToPage);
   }
 
 });
