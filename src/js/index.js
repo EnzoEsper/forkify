@@ -1,6 +1,7 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import * as searchView from './views/searchView'
+import * as recipeView from './views/recipeView'
 import {elements, renderLoader, clearLoader, elementStrings} from './views/base';
 
 /* **ESTADO GLOBAL DE LA APP **
@@ -61,7 +62,8 @@ const controlRecipe = async () => {
 
   if (id) {
     // Preparar la UI para los cambios
-
+    recipeView.clearRecipe(); 
+    renderLoader(elements.recipe);
     // Crear un nuevo objeto recipe y modificar los
     state.recipe = new Recipe(id);
     
@@ -77,8 +79,9 @@ const controlRecipe = async () => {
       state.recipe.calcServings();
       
       // Render the recipe
-      console.log(state.recipe);
-      
+      clearLoader();
+      recipeView.renderRecipe(state.recipe);
+
     } catch (error) {
       alert('Error processing recipe!');
     }
