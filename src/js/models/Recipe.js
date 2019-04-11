@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {key} from '../config'
+import { parse } from 'path';
 
 export default class Recipe {
   constructor(id) {
@@ -30,5 +31,66 @@ export default class Recipe {
   calcServings() {
     this.servings = 4;
   }
+
+  parseIngredients () {
+    const unitsLong = ['tablespoons', 'tablespoon', 'ounces' , 'ounce', 'teaspoons', 'teaspoon', 'cups', 'pounds'];
+    const unitShort = ['tbsp', 'tbsp', 'oz', 'oz', 'tsp', 'tsp', 'cup', 'pound'];
+
+    const newIngredients = this.ingredients.map(el => {
+      // 1. Hacer las unidades uniformes
+      let ingredient = el.toLowerCase();
+      // Reemplaza en el ingrediente las unidades largas por las cortas
+      unitsLong.forEach((unit, i) => {
+        ingredient = ingredient.replace(unit, unitShort[i]);
+      })
+
+      // 2. Remover parentesis
+      ingredient = ingredient.replace(/ *\([^)]*\) */g, ' ');
+
+      // 3. Parse ingredients into count, unit and ingredient
+      const arrIng = ingredient.split(' ');
+      const unitIndex = arrIng.findIndex(el2 => unitShort.includes(el2));
+      
+      let objIng;
+      if (unitIndex > -1) {
+        // Hay una unidad
+        const arrCount = arrIng.slice(0, unitIndex);
+        let count;
+
+        if (arrCount.length === 1) {
+          count = eval(arrIng[0].replace('-', '+'));
+        } else {
+          count = eval(arrIng.slice(0, unitIndex).join('+'));
+        };
+
+        objIng = {
+          count,
+          unit: arrIng[unitIndex],
+          ingredient: arrIng.slice(unitIndex + 1).join(' ')
+        };
+
+      } else if (parseInt(arrIng[0], 10)) {
+        // No hay una unidad, pero el primer elemento del arreglo es un numero
+        objIng = {
+          count: parseInt(arrIng[0], 10),
+          unit: '',
+          ingredient: arrIng.slice(1).join(' ')
+        };
+
+      } else if (unitIndex === -1) {
+        // No hay una unidad
+        objIng = {
+          count: 1,
+          unit: '',
+          ingredient
+        };
+      } 
+
+      return objIng;
+    });
+
+    this.ingredients = newIngredients;
+  }
+
 }
 
